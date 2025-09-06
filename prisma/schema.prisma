@@ -1,0 +1,78 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../lib/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  username   String
+  userId     String   @unique
+  email      String   @unique
+  profilePic String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  notes      Note[]
+  Folder     Folder[]
+}
+
+model Note {
+  id          String        @id @default(uuid())
+  name        String
+  content     String
+  creator     User          @relation(fields: [creatorId], references: [id])
+  creatorId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  folders     Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId    String?
+  isStarred   Boolean       @default(false)
+  isPinned    Boolean       @default(false)
+  isDeleted   Boolean       @default(false)
+  wordCount   Int           @default(0)
+  Attachments Attachments[]
+  tag         Tag[]         @relation("NotesTag")
+  Block       Block[]
+}
+
+model Folder {
+  id          String   @id @default(uuid())
+  name        String
+  notes       Note[]
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  parentId    String?
+  parent      Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children    Folder[] @relation("FolderHierarchy")
+}
+
+model Attachments {
+  id        String   @id @default(uuid())
+  url       String
+  filename  String
+  notes     Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId    String
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id   String @id @default(uuid())
+  name String @unique
+  note Note[] @relation("NotesTag")
+}
+
+model Block {
+  id       String @id @default(uuid())
+  type     String
+  content  String
+  notes    Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId   String
+  position Int
+}
