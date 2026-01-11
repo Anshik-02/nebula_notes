@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export const initalProfile = async () => {
+export const initialProfile = async () => {
   const user = await currentUser();
 
   if (!user) {
@@ -11,27 +11,21 @@ export const initalProfile = async () => {
 
   const email = user.emailAddresses[0].emailAddress;
 
-
-  let profile = await db.user.findFirst({
+  const profile = await db.user.upsert({
     where: {
-      OR: [
-        { userId: user.id },
-        { email },
-      ],
+      userId: user.id, // MUST be @unique
+    },
+    update: {
+      email, // optional sync
+      profilePic: user.imageUrl,
+    },
+    create: {
+      userId: user.id,
+      email,
+      username: user.firstName ?? "Nebula User",
+      profilePic: user.imageUrl,
     },
   });
-
-
-  if (!profile) {
-    profile = await db.user.create({
-      data: {
-        userId: user.id,
-        email,
-        username: user.firstName ?? "Nebula User",
-        profilePic: user.imageUrl,
-      },
-    });
-  }
 
   return profile;
 };
