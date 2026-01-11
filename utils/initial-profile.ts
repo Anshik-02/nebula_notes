@@ -11,21 +11,27 @@ export const initalProfile = async () => {
 
   const email = user.emailAddresses[0].emailAddress;
 
-  const profile = await db.user.upsert({
+  // 1️⃣ Check if user already exists by email OR clerk userId
+  let profile = await db.user.findFirst({
     where: {
-      userId: user.id, // MUST be @unique
-    },
-    update: {
-      email, // optional sync
-      profilePic: user.imageUrl,
-    },
-    create: {
-      userId: user.id,
-      email,
-      username: user.firstName ?? "Nebula User",
-      profilePic: user.imageUrl,
+      OR: [
+        { userId: user.id },
+        { email },
+      ],
     },
   });
+
+  // 2️⃣ If not exists → create
+  if (!profile) {
+    profile = await db.user.create({
+      data: {
+        userId: user.id,
+        email,
+        username: user.firstName ?? "Nebula User",
+        profilePic: user.imageUrl,
+      },
+    });
+  }
 
   return profile;
 };
