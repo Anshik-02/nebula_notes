@@ -30,8 +30,6 @@ if (!profile) {
   });
 
 
-  
-
 
 const cards = [
   {

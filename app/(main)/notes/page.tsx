@@ -51,7 +51,7 @@ const AllNotes = async () => {
       transition-all duration-300 mt-10 
       flex justify-between cursor-pointer"
     >
-      <div className="flex-1 min-w-0"> {/* prevents overflow */}
+      <div className="flex-1 min-w-0"> 
         <p className="text-xl sm:text-2xl font-semibold primary-text truncate">
           {note.name}
         </p>
@@ -61,7 +61,7 @@ const AllNotes = async () => {
     key={i}
     className="text-sm mt-2 secondary-text leading-relaxed line-clamp-2 sm:line-clamp-3 break-words"
   >
-    {block.content.replace(/<[^>]+>/g, "")} {/* strip HTML tags */}
+    {block.content.replace(/<[^>]+>/g, "")}
   </div>
 ))}
 

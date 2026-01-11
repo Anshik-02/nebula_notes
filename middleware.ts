@@ -7,7 +7,6 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect()
   }
 }, {
-  // 💡 Add this:
   afterSignInUrl: '/dashboard',
   afterSignUpUrl: '/dashboard',
 })

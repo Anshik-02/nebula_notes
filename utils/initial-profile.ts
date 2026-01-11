@@ -1,25 +1,37 @@
-  import { db } from "@/lib/db";
-  import { currentUser } from "@clerk/nextjs/server";
-  import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-  export const initalProfile = async () => {
-    const user = await currentUser();
+export const initalProfile = async () => {
+  const user = await currentUser();
 
-    if (!user) {
-      return redirect("/signin");
-    }
+  if (!user) {
+    redirect("/signin");
+  }
 
-    const profile = await db.user.upsert({
-      where: {
+  const email = user.emailAddresses[0].emailAddress;
+
+
+  let profile = await db.user.findFirst({
+    where: {
+      OR: [
+        { userId: user.id },
+        { email },
+      ],
+    },
+  });
+
+
+  if (!profile) {
+    profile = await db.user.create({
+      data: {
         userId: user.id,
-      },
-      update: {},
-      create: {
-        userId: user.id,
-        username: user.firstName || "",
+        email,
+        username: user.firstName ?? "Nebula User",
         profilePic: user.imageUrl,
-        email: user.emailAddresses[0].emailAddress,
       },
     });
-    return profile;
-  };
+  }
+
+  return profile;
+};

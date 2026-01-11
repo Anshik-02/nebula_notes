@@ -35,7 +35,6 @@ export default function MultiBlockEditor() {
   const param = useParams() as { pageId: string };
   const isMounted = useRef(false);
 
-  // Mobile-friendly sensors with activationConstraint + passive:false for touch
   const sensors = useSensors(
     useSensor(TouchSensor, {
       activationConstraint: { delay: 180, tolerance: 5 },
@@ -241,7 +240,7 @@ function SortableBlock({
   return (
     <div ref={setNodeRef} style={style} className="group rounded-md p-1">
       <div className="flex items-start gap-2">
-        {/* Drag handle — increase tappable area, touch-action none, user-select none */}
+        
         <button
           type="button"
           ref={setActivatorNodeRef}
