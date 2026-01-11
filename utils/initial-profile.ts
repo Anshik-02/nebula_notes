@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export const initialProfile = async () => {
+export const initalProfile = async () => {
   const user = await currentUser();
 
   if (!user) {
