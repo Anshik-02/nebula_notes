@@ -1,13 +1,11 @@
 import StarField2 from "@/components/starFeild2";
 import { db } from "@/lib/db";
 import { initalProfile } from "@/utils/initial-profile";
-import { Star } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 const AllNotes = async () => {
   const profile = await initalProfile();
-
   const response = await db.note.findMany({
     where: { creatorId: profile.id
       ,isDeleted:false
@@ -82,7 +80,6 @@ const AllNotes = async () => {
     </div>
   </Link>
 ))}
-
       </div>
     </div>
   );

@@ -11,27 +11,25 @@ export const initalProfile = async () => {
 
   const email = user.emailAddresses[0].emailAddress;
 
-  // 1️⃣ Check if user already exists by email OR clerk userId
-  let profile = await db.user.findFirst({
-    where: {
-      OR: [
-        { userId: user.id },
-        { email },
-      ],
+  // Use upsert to handle create OR update atomically
+  const profile = await db.user.upsert({
+    where: { 
+      userId: user.id  // Must match your @unique field in schema
+    },
+    update: {
+      // Update these fields if user exists (keeps data fresh)
+      email,
+      username: user.firstName ?? "Nebula User",
+      profilePic: user.imageUrl,
+    },
+    create: {
+      // Create with these fields if user doesn't exist
+      userId: user.id,
+      email,
+      username: user.firstName ?? "Nebula User",
+      profilePic: user.imageUrl,
     },
   });
-
-  // 2️⃣ If not exists → create
-  if (!profile) {
-    profile = await db.user.create({
-      data: {
-        userId: user.id,
-        email,
-        username: user.firstName ?? "Nebula User",
-        profilePic: user.imageUrl,
-      },
-    });
-  }
 
   return profile;
 };
